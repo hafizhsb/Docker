@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+     # MySQL configuration overrides
+      - /home/hafiz/Desktop/Docker/mysql-conf/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+     # Permanent DB data storage
+      - /home/hafiz/Desktop/mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  api:
+    container_name: web-api
+    build:
+      context: '/home/hafiz/Desktop/app/api'
+    volumes:
+      - /home/hafiz/Desktop/app/api:/var/www/html
+    ports:
+      - 8181:80
+    depends_on:
+      - db
+
+  frontend:
+    container_name: web-fe
+    build:
+      context: '/home/hafiz/Desktop/app/frontend'
+    volumes:
+      - /home/hafiz/Desktop/app/frontend:/var/www/html
+    ports:
+      - 8282:80
+    depends_on:
+      - db
